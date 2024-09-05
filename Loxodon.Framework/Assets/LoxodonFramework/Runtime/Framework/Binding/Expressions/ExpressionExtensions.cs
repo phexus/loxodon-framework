@@ -23,8 +23,8 @@
  */
 
 using System;
-using System.Reflection;
 using System.Linq.Expressions;
+using System.Reflection;
 using Loxodon.Framework.Binding.Reflection;
 
 namespace Loxodon.Framework.Binding.Expressions
@@ -43,6 +43,11 @@ namespace Loxodon.Framework.Binding.Expressions
 
         internal static object Get(this MemberInfo info, object root)
         {
+            if (root == null)
+            {
+                return null;
+            }
+
             var fieldInfo = info as FieldInfo;
             if (fieldInfo != null)
             {
@@ -58,11 +63,15 @@ namespace Loxodon.Framework.Binding.Expressions
             {
                 var proxyPropertyInfo = propertyInfo.AsProxy();
                 if (proxyPropertyInfo != null)
+                {
                     return proxyPropertyInfo.GetValue(root);
+                }
 
                 var method = propertyInfo.GetGetMethod();
                 if (method != null)
+                {
                     return method.Invoke(root, null);
+                }
             }
 
             throw new NotSupportedException("Bad MemberInfo type.");

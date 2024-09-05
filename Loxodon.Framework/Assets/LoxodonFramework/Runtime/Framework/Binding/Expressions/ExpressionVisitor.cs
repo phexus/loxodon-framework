@@ -29,6 +29,8 @@ using System.Linq.Expressions;
 
 namespace Loxodon.Framework.Binding.Expressions
 {
+    using System.Linq;
+
     abstract class ExpressionVisitor
     {
         public virtual Expression Visit(Expression expr)
@@ -98,8 +100,8 @@ namespace Loxodon.Framework.Binding.Expressions
                     return this.VisitParameter((ParameterExpression)expr);
                 case ExpressionType.NewArrayInit:
                     return this.VisitNewArrayInit((NewArrayExpression)expr);
-                //case ExpressionType.New:
-                //return this.VisitNew((NewExpression)expr);
+                case ExpressionType.New:
+                    return this.VisitNew((NewExpression)expr);
                 //case ExpressionType.NewArrayBounds:
                 //    return this.VisitNewArray((NewArrayExpression)expr);
                 //case ExpressionType.MemberInit:
@@ -107,7 +109,7 @@ namespace Loxodon.Framework.Binding.Expressions
                 //case ExpressionType.ListInit:
                 //    return this.VisitListInit((ListInitExpression)expr);
                 default:
-                    throw new NotSupportedException("Expressions of type " + expr.Type + " are not supported.");
+                    throw new NotSupportedException("Expressions of type " + expr.Type + expr.NodeType + " are not supported.");
             }
         }
 
@@ -220,6 +222,12 @@ namespace Loxodon.Framework.Binding.Expressions
             if (args != expr.Expressions)
                 return Expression.NewArrayInit(expr.Type, args);
             return expr;
+        }
+
+        protected virtual Expression VisitNew(NewExpression expr)
+        {
+            Expression[] parameters = expr.Constructor.GetParameters().Select(p => (Expression)Expression.Parameter(p.ParameterType, p.Name)).ToArray();
+            return Expression.New(expr.Constructor, parameters);
         }
 
         protected virtual Expression VisitConstant(ConstantExpression expr)

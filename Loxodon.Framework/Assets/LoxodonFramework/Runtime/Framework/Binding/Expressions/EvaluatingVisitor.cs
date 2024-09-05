@@ -23,11 +23,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Loxodon.Framework.Binding.Expressions
 {
@@ -350,6 +350,7 @@ namespace Loxodon.Framework.Binding.Expressions
                             case TypeCode.Double: return (double)left == (double)right;
                             case TypeCode.Decimal: return (decimal)left == (decimal)right;
                             case TypeCode.Boolean: return (bool)left == (bool)right;
+                            case TypeCode.Object: return left == right;
                         }
                         break;
                     }
@@ -370,6 +371,7 @@ namespace Loxodon.Framework.Binding.Expressions
                             case TypeCode.Double: return (double)left != (double)right;
                             case TypeCode.Decimal: return (decimal)left != (decimal)right;
                             case TypeCode.Boolean: return (bool)left != (bool)right;
+                            case TypeCode.Object: return left != right;
                         }
                         break;
                     }
@@ -1013,6 +1015,14 @@ namespace Loxodon.Framework.Binding.Expressions
                 }
             }
             var result = visitor.Visit(expr.Body);
+
+            if (result is NewExpression newExpression)
+            {
+                var lambdaExpr = Expression.Lambda(newExpression);
+                Delegate constructorDelegate = lambdaExpr.Compile();
+                return constructorDelegate.DynamicInvoke();
+            }
+
             return ((ConstantExpression)result).Value;
         }
     }
