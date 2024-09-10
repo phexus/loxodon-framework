@@ -55,8 +55,8 @@ namespace Loxodon.Framework.Binding.Proxy.Sources.Object
             }
             else
             {
-                if (log.IsWarnEnabled)
-                    log.WarnFormat("The type {0} does not inherit the INotifyPropertyChanged interface and does not support the PropertyChanged event.", propertyInfo.DeclaringType.Name);
+                // if (log.IsWarnEnabled)
+                //     log.WarnFormat("The type {0} does not inherit the INotifyPropertyChanged interface and does not support the PropertyChanged event.", propertyInfo.DeclaringType.Name);
             }
         }
 
